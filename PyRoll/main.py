@@ -20,17 +20,25 @@ with open(pyroll_csv) as csvfile:
     # Skip header
     next(csvreader)
 
+    # Iterates through the rows
     for row in csvreader:
+
+        # Count total votes
         votes = votes + 1
+
+        # Adds candidate name if isn't in dict and pair it with the candidates vote count
         if row[2] not in candidates:
             candidates[row[2]] = [1]
+        # Counts votes for each candidate
         else:
             candidates[row[2]][0] = candidates[row[2]][0] + 1
-        
+    
+    # Iterates through each candidate to calculate their percentage of votes
     for key in candidates.keys():
 
         candidates[key].append(candidates[key][0]/votes*100)
-            
+        
+        # Looks for the max vote count to find winner
         if candidates[key][0]>max:
             max = candidates[key][0]
             winner = key
