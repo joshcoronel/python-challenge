@@ -9,8 +9,10 @@ pybank_csv = os.path.join("Resources", "budget_data.csv")
 # Initilize variables
 net = 0
 months = 0
-date = []
-profitloss = []
+monthly_change = 0
+total_change = 0
+maxChange = -99999
+minChange = 99999
 
 
 # Open the file using "read" mode. Specify the variable to hold the contents
@@ -23,23 +25,25 @@ with open(pybank_csv) as csvfile:
 
     # Calculate the net value of profit/loses and count number of months
     for row in csvreader:
-        net = net + round(float(row[1]))
+        net = net + round(int(row[1]))
         months = months + 1 
-        date.append(row[0])
-        profitloss.append(float(row[1]))
+        
+        if months > 1:
+            monthly_change = int(row[1]) - previous_row
+            total_change = total_change + monthly_change
+        
+        previous_row = int(row[1])
 
+        if monthly_change > maxChange:
+            maxChange = monthly_change
+            maxMonth = row[0]
 
+        if monthly_change < minChange:
+            minChange = monthly_change
+            minMonth = row[0]
     
     # Use the net value and total number of months to calculate the average change
-    avg_change = round(net/months,2)
-
-    maxVal = max(profitloss)
-    maxInd = profitloss.index(maxVal)
-    maxDate = date[maxInd]
-
-    minVal = min(profitloss)
-    minInd = profitloss.index(minVal)
-    minDate = date[minInd]
+    avg_change = round(total_change/(months-1),2)
 
 output_file = os.path.join("analysis", "budget_analysis.txt")
 with open(output_file,'w') as text:
@@ -54,10 +58,10 @@ with open(output_file,'w') as text:
     text.write(f'Total: ${net}\n')
     print(f'Average Change: ${avg_change}')
     text.write(f'Average Change: ${avg_change}\n')
-    print(f'Greatest Increase in Profits: {maxDate} (${maxVal})')
-    text.write(f'Greatest Increase in Profits: {maxDate} (${maxVal})\n')
-    print(f'Greatest Decrease in Profits: {minDate} (${minVal})')
-    text.write(f'Greatest Decrease in Profits: {minDate} (${minVal})\n')
+    print(f'Greatest Increase in Profits: {maxMonth} (${maxChange})')
+    text.write(f'Greatest Increase in Profits: {maxMonth} (${maxChange})\n')
+    print(f'Greatest Decrease in Profits: {minMonth} (${minChange})')
+    text.write(f'Greatest Decrease in Profits: {minMonth} (${minChange})\n')
 
     
     
